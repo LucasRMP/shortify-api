@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./dev.Dockerfile
+    entrypoint: dockerize -wait tcp://db:27017 -timeout 40s ./.docker/entrypoint.sh
+    container_name: url-shortener
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/node/app
+    depends_on:
+      - db
+    extra_hosts:
+      - 'host.docker.internal:172.17.0.1'
+
+  db:
+    image: mongo:latest
+    container_name: url-shortener-db
+    tty: true
+    volumes:
+      - ./.docker/dbdata:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
