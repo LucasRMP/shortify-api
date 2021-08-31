@@ -13,7 +13,11 @@ let MongoDatabaseProviderModule = class MongoDatabaseProviderModule {
 };
 MongoDatabaseProviderModule = __decorate([
     common_1.Module({
-        imports: [mongoose_1.MongooseModule.forRoot('mongodb://root:pass@db:27017/shortify')],
+        imports: [
+            mongoose_1.MongooseModule.forRoot('mongodb://root:pass@host.docker.internal:27017', {
+                dbName: 'shortify',
+            }),
+        ],
     })
 ], MongoDatabaseProviderModule);
 exports.MongoDatabaseProviderModule = MongoDatabaseProviderModule;

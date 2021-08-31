@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./dev.Dockerfile
     entrypoint: dockerize -wait tcp://db:27017 -timeout 40s ./.docker/entrypoint.sh
-    container_name: url-shortener
+    container_name: shortify
     ports:
       - 3000:3000
     volumes:
@@ -18,12 +18,13 @@ services:
 
   db:
     image: mongo:latest
-    container_name: url-shortener-db
+    container_name: shortify-db
     tty: true
     volumes:
       - ./.docker/dbdata:/data/db
     ports:
       - 27017:27017
+    user: '1000:1000'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
