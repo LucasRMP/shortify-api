@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
+
+import { Url } from 'src/models/urls/schemas/url.schema';
 import { CreateUrlDto } from './dto/create-url.dto';
-import { UpdateUrlDto } from './dto/update-url.dto';
 
 @Injectable()
 export class UrlsService {
-  create(createUrlDto: CreateUrlDto) {
-    return 'This action adds a new url';
+  constructor(@InjectModel(Url.name) private urlModel: Model<Url>) {}
+
+  async create(createUrlDto: CreateUrlDto, options: { plain?: boolean } = {}) {
+    const url = new this.urlModel(createUrlDto);
+    await url.save();
+    return options.plain ? url.toJSON({ versionKey: false }) : url;
   }
 
-  findAll() {
-    return `This action returns all urls`;
+  async findBySlug(slug: string) {
+    return this.urlModel
+      .findOneAndUpdate({ slug }, { $inc: { visits: 1 } }, { new: true })
+      .lean();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} url`;
-  }
-
-  update(id: number, updateUrlDto: UpdateUrlDto) {
-    return `This action updates a #${id} url`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} url`;
+  findOne(conditions: FilterQuery<Url>) {
+    return this.urlModel.findOne(conditions);
   }
 }
